@@ -1,9 +1,7 @@
 # Tool-output retrieval data
 
-`toolout_4096.parquet` is the exact file used in the paper: 300 questions over real command outputs, 100 per source.
-An assistant has run a command and must copy one exact string from its output. Same columns as kvpress' RULER data
-(`context`, `question`, `answer_prefix`, `answer`, `task`, `max_new_tokens`, plus `depth`, the relative position of
-the target record in the context), scored with RULER's string match.
+`toolout_4096.parquet` is the file used in the paper for tool-output retrieval data analysis. It contains 300 questions over real command outputs, 100 per source.
+
 
 | task | command output | question | answer |
 |---|---|---|---|
@@ -22,7 +20,6 @@ the target record in the context), scored with RULER's string match.
 - The prompt ends with the question and "Answer with the exact text from the output."; the answer prefix is
   "Answer:".
 - Seeds: 0, 1 and 2 for the three sources.
-- No design choice of Afterglow was made on this task.
 
 ## Sources
 
@@ -30,8 +27,7 @@ the target record in the context), scored with RULER's string match.
   `huggingface/datasets`, numbers 1 to 2862 appear), rendered as a GitHub API response: number, title, user login,
   state, creation time, number of comments, labels, URL. Newest first.
 - **Git log:** the public history of `psf/requests` (commits from 2011 to July 2026 appear), with
-  `--date=format:%a %b %d %H:%M:%S %Y`. Only author names are included, no e-mail addresses. Some commit subjects
-  contain e-mail-like strings verbatim.
+  `--date=format:%a %b %d %H:%M:%S %Y`. Only author names are included
 - **Grep:** `grep -rn --include=*.py "def "` over `datasets`, `pandas/core`, `torch/nn` and `accelerate`. The script
   also lists `transformers/generation` and `transformers/pipelines`, but no sample from them passed the filters. We
   used transformers 5.2.0, datasets 5.0.1, pandas 2.3.3, torch 2.14.0 and accelerate 1.15.0. Line numbers and

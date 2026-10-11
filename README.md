@@ -1,12 +1,8 @@
-# Afterglow: forward span propagation for query-aware KV cache eviction
+# Afterglow: Forward Span Propagation for Long-Context Recall under Query-Aware KV Cache Eviction
 
-Query-aware eviction methods (SnapKV and the methods built on it) score each context token by the attention the
-question pays to it, and keep the highest-scoring tokens. This attention concentrates on the *first* tokens of the
-span the question asks about. So eviction keeps the start of a value, identifier or title but drops its continuation,
-and the model copies a truncated or corrupted answer.
+Query-aware eviction methods (SnapKV and the methods built on it) score each context token by the attention the question pays to it, and keep the highest-scoring tokens. This attention concentrates on the *first* tokens of the span the question asks about. So eviction keeps the start of a value, identifier or title but drops its continuation, and the model copies a truncated or corrupted answer.
 
-Afterglow is a training-free plug-in that lets each token inherit the decayed score of the tokens before it, per
-layer and KV head, before the method's own selection at the same budget:
+Afterglow is a training-free plug-in that lets each token inherit the decayed score of the tokens before it before the method's own selection at the same budget:
 
 ```
 s'(t) = max( s(t), max_{j < t, j >= n_sink} gamma^(t - j) * s(j) )      gamma = 0.95, n_sink = 4
@@ -67,15 +63,8 @@ The tool-output data and how it was built are described in [`data/README.md`](da
 
 ## Notes
 
-- **Where Afterglow plugs in.** SnapKV and the KVzip+ scorer: on the per-token score. Ada-KV: before its head-wise
-  allocation. CriticalAdaKV: on the inner SnapKV score, because CriticalKV writes the largest float into scores it
-  protects.
-- **Negative scores.** Afterglow works in log space and needs scores >= 0. Scorers with negative scores (e.g.
-  Knorm, KeyDiff) need a rank-preserving positive transform first.
-- **Determinism.** On the same GPU, `scripts/evaluate.py` with kvpress 0.5.5 from PyPI reproduces the outputs of
-  our experiment code exactly. Across GPUs, bf16 numerics change some long free-form outputs (e.g. word counts in
-  RULER's cwe/fwe), so individual answers and scores can differ slightly from the paper.
-- **Masking, not pruning.** The KVzip+ scorer allocates one budget across layers and heads and masks pruned pairs,
-  as kvpress does for Ada-KV. It does not shrink the cache.
+- **Plugin location** SnapKV and the KVzip+ scorer: on the per-token score. Ada-KV: before its head-wise
+  allocation. CriticalAdaKV: on the inner SnapKV score, because CriticalKV writes the largest float into scores it protects.
+- **Negative scores.** Afterglow works in log space and needs scores >= 0. Scorers with negative scores (e.g. Knorm, KeyDiff) need a rank-preserving positive transform first.
 
 License: Apache-2.0.
