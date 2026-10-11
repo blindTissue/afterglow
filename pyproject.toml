@@ -1,0 +1,13 @@
+[project]
+name = "afterglow"
+version = "0.1.0"
+description = "Afterglow: forward span propagation for query-aware KV cache eviction (kvpress plug-in)"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = ["kvpress==0.5.5", "torch>=2.3.1", "transformers>=4.56.0,<5.3", "datasets", "pandas"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools]
+packages = ["afterglow"]
